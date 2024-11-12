@@ -1,4 +1,6 @@
 const path = require('path');
+const iconv = require('iconv-lite');
+
 const fs = require('fs-extra');
 
 function find(str, start, end) {
@@ -38,8 +40,19 @@ function includes(str, arr) {
     return false;
 }
 
-for (let i = 1; i <= 1231692; ++i) {
-    if (i%1000 == 0) console.log(i);
+const base = './txt';
+for (const year of fs.readdirSync(base)) {
+  console.log(year)
+  for (const month of fs.readdirSync(path.join(base, year))) {
+    for (const day of fs.readdirSync(path.join(base, year, month))) {
+      for (const article of fs.readdirSync(path.join(base, year, month, day))) {
+        const raw = iconv.decode(fs.readFileSync(path.join(base, year, month, day, article)), 'gb2312');
+        console.log(raw)
+        return
+      }
+    }
+  }
+    break;
     const raw = fs.readFileSync(
         path.join('json', Math.floor(i/1000).toString(), i.toString() + '.json')
     ).toString();

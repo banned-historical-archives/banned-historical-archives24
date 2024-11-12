@@ -9,7 +9,7 @@ function find(str, start, end) {
     return str.substring(a + start.length, b);
 }
 
-const keywords = ['张春桥','江青','王洪文','姚文元','毛远新', '毛泽东', '毛主席', '四人帮', '极左', '左倾', '右倾', '极右','资产阶级', '修正主义', '剥削', '奴隶','文革','文化大革命', '叶剑英', '北决扬', '鲁礼安', '无政府'];
+const keywords = ['张春桥','江青','王洪文','姚文元','毛远新', '毛泽东', '毛主席', '四人帮', '极左', '左倾', '右倾', '极右','资产阶级', '修正主义', '剥削', '奴隶','文革','文化大革命', '叶剑英', '北决扬', '鲁礼安', '无政府主义'];
 const keywords_special = [
   {year_start: 1958, year_end: 1981, keyword: '邓小平'},
   {year_start: 1958, year_end: 1981, keyword: '刘少奇'},
@@ -80,7 +80,7 @@ for (const year of fs.readdirSync(base)) {
         includes(json.authors.join(','), keywords) ||
         keywords_special.reduce((m, k) => {
           return m || (
-            k.year_start <= json.date[0].year && k.year_end >= json.date[0].year && (
+            k.year_start <= json.dates[0].year && k.year_end >= json.dates[0].year && (
               k.keyword ? (
                 json.title.indexOf(k.keyword) >= 0 ||
                 json.authors.reduce((m,a) => {

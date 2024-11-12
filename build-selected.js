@@ -41,44 +41,57 @@ function includes(str, arr) {
 }
 
 const base = './txt';
+let i = 0;
 for (const year of fs.readdirSync(base)) {
   console.log(year)
   for (const month of fs.readdirSync(path.join(base, year))) {
     for (const day of fs.readdirSync(path.join(base, year, month))) {
       for (const article of fs.readdirSync(path.join(base, year, month, day))) {
         const raw = iconv.decode(fs.readFileSync(path.join(base, year, month, day, article)), 'gb2312');
-        console.log(raw)
-        return
-      }
-    }
-  }
-    break;
-    const raw = fs.readFileSync(
-        path.join('json', Math.floor(i/1000).toString(), i.toString() + '.json')
-    ).toString();
-    const json = JSON.parse(raw);
 
-    const normalized_title = normalize(json.ytitle + json.mtitle + json.ftitle);
-    const normalized_content = normalize(raw);
+    const json = {
+      date: [{
+        year: parseInt(year),
+        month: parseInt(month.slice(4)),
+        day: parseInt(day.slice(6)),
+      }],
+      page: parseInt(raw.substring(raw.indexOf('〖BH/版号〗') + '〖BH/版号〗'.length, raw.indexOf('〖-BH/版号〗')).trim()),
+      title: 
+      raw.substring(raw.indexOf('〖BT/标题〗') + '〖BT/标题〗'.length, raw.indexOf('〖-BT/标题〗')) +
+      (raw.indexOf('〖FT/副题〗') != -1 ?
+      raw.substring(raw.indexOf('〖FT/副题〗') + '〖FT/副题〗'.length, raw.indexOf('〖-FT/副题〗')) : ''),
+      authors: 
+      raw.indexOf('〖ZZ/作者〗') != -1 ?
+      raw.substring(raw.indexOf('〖ZZ/作者〗') + '〖ZZ/作者〗'.length, raw.indexOf('〖-ZZ/作者〗')).split(' ')
+      :[],
+      parts: raw.substring(raw.indexOf('〖ZW/正文〗') + '〖ZW/正文〗'.length, raw.indexOf('〖-ZW/正文〗')).trim().split('\n').map(x => ({
+        type: 'paragraph',
+        text: x.trim()
+      })),
+    };
     if (!(
-        includes(normalized_title, keywords) || 
+        includes(json.title, keywords) || 
         includes(json.authors.join(','), keywords) ||
         keywords_special.reduce((m, k) => {
           return m || (
             k.year_start <= json.date[0].year && k.year_end >= json.date[0].year && (
               k.keyword ? (
-                normalized_title.indexOf(k.keyword) >= 0 ||
+                json.title.indexOf(k.keyword) >= 0 ||
                 json.authors.reduce((m,a) => {
                   return m || a == k.keyword
                 }, false)
-              ) : normalized_content.indexOf(k.content_keyword) >= 0
+              ) : raw.indexOf(k.content_keyword) >= 0
             )
           )
         }, false)
     )) continue;
-    const dir = path.join(__dirname, 'selected', Math.floor(i / 1000).toString());
+  ++i;
+        const dir = path.join(__dirname, 'selected', Math.floor(i / 1000).toString());
     fs.ensureDirSync(dir);
-    fs.writeFileSync(path.join(dir, i + '.json'), JSON.stringify(json))
+    fs.writeFileSync(path.join(dir, article + '.json'), JSON.stringify(json))
+      }
+    }
+  }
 }
 console.log('done');
 

@@ -51,7 +51,7 @@ for (const year of fs.readdirSync(base)) {
 
         const banhao = parseInt(raw.substring(raw.indexOf('〖BH/版号〗') + '〖BH/版号〗'.length, raw.indexOf('〖-BH/版号〗')).trim());
     const json = {
-      date: [{
+      dates: [{
         year: parseInt(year),
         month: parseInt(month.slice(4)),
         day: parseInt(day.slice(6)),

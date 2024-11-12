@@ -49,13 +49,19 @@ for (const year of fs.readdirSync(base)) {
       for (const article of fs.readdirSync(path.join(base, year, month, day))) {
         const raw = iconv.decode(fs.readFileSync(path.join(base, year, month, day, article)), 'gb2312');
 
+        const banhao = parseInt(raw.substring(raw.indexOf('〖BH/版号〗') + '〖BH/版号〗'.length, raw.indexOf('〖-BH/版号〗')).trim());
     const json = {
       date: [{
         year: parseInt(year),
         month: parseInt(month.slice(4)),
         day: parseInt(day.slice(6)),
       }],
-      page: parseInt(raw.substring(raw.indexOf('〖BH/版号〗') + '〖BH/版号〗'.length, raw.indexOf('〖-BH/版号〗')).trim()),
+      page_start: banhao,
+      page_end: banhao,
+      description: '',
+      is_range_date: false,
+      comments: [],
+      comment_pivots: [],
       title: 
       raw.substring(raw.indexOf('〖BT/标题〗') + '〖BT/标题〗'.length, raw.indexOf('〖-BT/标题〗')) +
       (raw.indexOf('〖FT/副题〗') != -1 ?
